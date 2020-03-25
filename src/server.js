@@ -25,11 +25,11 @@ polka({ server }) // You can also use Express
 
 io(server).on('connection', function(socket){
 	console.log('a user connected');
-	socket.broadcast.emit('chat message', 'SOME USER CONNECT!');
+	socket.broadcast.emit('chat message', '{"message" : "User connect!"}');
 
 	socket.on('disconnect', function(){
-	  console.log('user disconnected');
-	  socket.broadcast.emit('chat message', 'LAST USER DISCONNECT!');
+		console.log('user disconnected');
+		socket.broadcast.emit('chat message', '{"message" : "User disconnect..."}');
 	});
 
 	socket.on('chat message', function(msg){

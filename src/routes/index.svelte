@@ -37,19 +37,20 @@
 	let message = ''
 	let name = ''
 	const sandMessage = (name, text) => {
-		socket.emit('chat message', `${name}: ${text}`)
+		socket.emit('chat message', `{"name": "${name}", "message": "${text}"}`)
 
 
-		messages = [...messages, `${name}: ${message}`]
+		messages = [...messages, {name: name, message: message}]
 		message = ''
 		name = ''
 	}
 
-	let messages = [{name: 'name', message: 'message'}]
+	let messages = [{name: 'Jon', message: 'Hi all people!'}]
 
 
 	    socket.on('chat message', function(data){
-			messages = [...messages, data]
+			console.log(JSON.parse(data))
+			messages = [...messages, {name: JSON.parse(data).name, message: JSON.parse(data).message}]
 			console.log(data)
 			console.log(messages, '2log')
     	});
@@ -57,10 +58,10 @@
 </script>
 
 <svelte:head>
-	<title>Sapper project template</title>
+	<title>Sapper Chat</title>
 </svelte:head>
 
-<h1>Great success!</h1>
+<h1>CHAT</h1>
 
 <figure>
 	<input type='text' placeholder="name" value={name} on:input={e => name = e.target.value}>
@@ -70,12 +71,14 @@
 <div class='messages'>
 {#each messages as message}
 	<div>
-		<!-- <b><label>{message.name}: </label></b>
-		<span>{message.message}</span> -->
-		<span>{message}</span>
+		{#if message.name}
+			<b><label>{message.name}: </label></b>
+			<span>{message.message}</span>
+		{:else}
+			<b><span>{message.message}</span></b>
+		{/if}
 	</div>
 {/each}
 </div>
-<p><strong>Try editing this file (src/routes/index.svelte) to test live reloading.</strong></p>
 
 
