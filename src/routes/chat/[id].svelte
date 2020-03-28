@@ -25,6 +25,7 @@
 		align-items: center;
 		background-color: #fff;
 		overflow: auto;
+		scroll-behavior: smooth;
 	}
 	.messages__item {
 		width: 90%;
@@ -77,23 +78,26 @@
 	import { onDestroy } from 'svelte';
 	import { goto } from '@sapper/app'
 	import { name } from '../../store.js'
+
+	const scrollBottom = (element, scroll) => {
+		element.scrollTop = scroll
+		console.log(scroll)
+	}
 	// if(!$name) goto('/')
 	let message = ''
 	let messages = [{name: 'Frank',message: 'Hi all!',  time: '4:20'}]
 	socket.on('test', data => {
 		console.log(data)
 		messages = [...messages, {name: data.name,message: data.message,  time: data.time}]
+		setTimeout(() => scrollBottom(document.querySelector('.messages'), document.querySelector('.messages').scrollHeight), 100);
 	})
-
 	const addMessage = () => {
 		let date = new Date
 		socket.emit('test', {name: $name, message: message,  time: `${date.getHours()}:${date.getMinutes()}`})
 		messages = [...messages, {name: $name, message: message,  time: `${date.getHours()}:${date.getMinutes()}`}]
 		message = ''
-		console.log(messages)
 
-		console.log(document.querySelector('.messages'))
-		document.querySelector('.messages').scrollTop()
+		setTimeout(() => scrollBottom(document.querySelector('.messages'), document.querySelector('.messages').scrollHeight), 100);
 	}
 	console.log(io())
 </script>
