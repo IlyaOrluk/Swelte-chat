@@ -21,7 +21,7 @@
 <script>
 	import { name } from '../store.js'
 
-
+	let room = ''
 </script>
 
 <svelte:head>
@@ -30,6 +30,9 @@
 
 <h1>login</h1>
 
-<input value={$name} placeholder="login" on:input={e => name.set(e.target.value)}>
-<a href='/chat/2'><button>Go</button></a>
 
+<form on:submit={() => {}}>
+	<input value={$name} placeholder="login" on:input={e => name.set(e.target.value)}>
+	<input type='text' placeholder="room" value={room} on:input={e => room = e.target.value}>
+	<a href={'/chat/'+room}>go</a>
+</form> 
