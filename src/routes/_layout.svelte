@@ -14,9 +14,12 @@
 		display: flex;
 		align-items: center;
 		flex-direction: column;
+		padding: 30px;
+		background: #ffffff78;;
 	}
 	:global(body) {
-		background-color: #fffede;
+		background: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.pixabay.com%2Fphoto%2F2016%2F02%2F29%2F09%2F57%2Fbokeh-1228326_640.jpg&f=1&nofb=1') no-repeat center / cover;
+		min-height: 100vh;
 	}
 </style>
 
