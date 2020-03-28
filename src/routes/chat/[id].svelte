@@ -80,11 +80,14 @@
 	import { goto } from '@sapper/app'
 	import { name } from '../../store.js'
 	export let id
+
+	if(!$name) goto('/')
+
 	const scrollBottom = (element, scroll) => {
 		element.scrollTop = scroll
 		console.log(scroll)
 	}
-	// if(!$name) goto('/')
+
 	let message = ''
 	let messages = [{name: 'Frank',message: 'Hi all!',  time: '4:20'}]
 	socket.on('test', data => {
