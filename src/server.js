@@ -28,13 +28,18 @@ io(server).sockets.on('connection', function(socket) {
 		console.log('user connect to '+'room_'+room)
 
 		socket.on('disconnect', function(){
+			socket.leave(room);
 			console.log('user disconnected', 'room_'+room)
 		})
 		
-		socket.on('test', (msg) => {
-			console.log(room, 'channel test')
-			socket.to(room).emit('test', msg)
+		socket.on('chat', (msg) => {
+			socket.to(room).emit('chat', msg)
 		})
+
+		// socket.on('leave room', () => {
+		// 	console.log('leave from '+room)
+		// 	socket.leave(room)
+		// })
 	})
 })
 
