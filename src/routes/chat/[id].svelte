@@ -1,14 +1,4 @@
 <style>
-
-	h1, h2, h3, h4 {
-		font-size: 1.8em;
-		text-transform: uppercase;
-		font-weight: 700;
-		color: #000;
-	}
-
-
-
 	main {
 		height: 100vh;
 		width: 100%;
@@ -74,26 +64,34 @@
 		height: 10vh;
 		display: flex;
 		justify-content: center;
+		align-items: center;
 		background: #ffd1bb;
 	}
 
 	form > input {
 		font-size: 16px;
+		height: 50px;
+		padding: 0 10px;
+		border: 0;
+		border-radius: 35px;
 	}
 
-	@media (min-width: 480px) {
-		h1 {
-			font-size: 4em;
-		}
+	form > button {
+		font-size: 26px;
+		border: 0;
+		border-radius: 50%;
+		height: 50px;
+		width: 50px;
+		background-color: transparent;
+		cursor: pointer;
 	}
+
 </style>
 
 
 <script context="module">
 	import io from 'socket.io-client'
-		const socket = io.connect()
-	
-		// console.log(socket)
+	const socket = io.connect()
 	export async function preload(page, session) {
 		const { id } = page.params
 
@@ -102,27 +100,26 @@
 	}
 </script>
 <script>
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte'
 	import { goto } from '@sapper/app'
-	import { scale } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
+	import { scale } from 'svelte/transition'
+	import { quintOut } from 'svelte/easing'
 	import { name } from '../../store.js'
+	import axios from 'axios'
 	export let id
 
 	// if(!$name) goto('/')
-	// onDestroy(() => {
-	// 	console.log('destroy onmount')
-	// 	socket.emit('leave room')
-	// })
+	onDestroy(() => {
+		console.log('destroy onmount')
+		socket.emit('leave room')
+	})
 	const scrollBottom = (element, scroll) => {
 		element.scrollTop = scroll
-		console.log(scroll)
 	}
 
 	let message = ''
 	let messages = [{name: 'Frank',message: 'Hi all!',  time: '4:20'}]
 	socket.on('chat', data => {
-		console.log(data)
 		messages = [...messages, {name: data.name,message: data.message,  time: data.time}]
 		setTimeout(() => scrollBottom(document.querySelector('.messages'), document.querySelector('.messages').scrollHeight), 210);
 	})
@@ -134,9 +131,31 @@
 
 		setTimeout(() => scrollBottom(document.querySelector('.messages'), document.querySelector('.messages').scrollHeight), 210);
 	}
-	console.log(io())
 
-
+	
+	const url = 'http://127.0.0.1:8000/auth/users/me/'
+	let user
+	const confirm = (token) => {
+		console.log('confirm chat')
+            axios.get(url,
+                {
+                    headers: {
+                        "Authorization" : `Bearer ${localStorage.getItem('Token')}` 
+                    }
+                }
+            )
+                .then(res => {
+					user = res.data
+					name.set(res.data.username)
+					console.log(res.data)
+				})
+    
+	}
+	
+	onMount(() => {
+		console.log('mount')
+		if(localStorage) confirm(localStorage.getItem('Token'))
+	})
 </script>
 
 <svelte:head>
@@ -165,7 +184,7 @@
 	</div>
 	<form on:submit={() => {}}>
 		<input type='text' placeholder="message" value={message} on:input={e => message = e.target.value}>
-		<button on:click|preventDefault={() => addMessage()}>ADD</button>
+		<button on:click|preventDefault={() => addMessage()}><i class="fas fa-paper-plane"></i></button>
 	</form> 
 </main>
 

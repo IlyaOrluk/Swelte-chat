@@ -36,10 +36,11 @@ io(server).sockets.on('connection', function(socket) {
 			socket.to(room).emit('chat', msg)
 		})
 
-		// socket.on('leave room', () => {
-		// 	console.log('leave from '+room)
-		// 	socket.leave(room)
-		// })
+		socket.on('leave room', () => {
+			console.log('leave from '+room)
+			socket.leave(room)
+		})
 	})
 })
+
 
