@@ -19,6 +19,7 @@ export const login = (username, password) => {
                 alert('invalid username or password')
             }
         })
+
 }
 
 export const register = async (email, username, password) => {
@@ -33,6 +34,22 @@ export const register = async (email, username, password) => {
     await login(username, password)
 }
 
+export const changeAvatar = (avatar) => {
+    axios.post('http://127.0.0.1:8000/api/user-avatar/', {
+        headers: {
+            "Authorization" : `Bearer ${localStorage.getItem('Token')}`
+        }
+    },
+    {
+        'avatar': `${avatar}`
+    }
+    ).then(response => {
+        console.log(response, 'avatar');
+    }).catch((error) => {
+        console.error('Error:', error);
+    });
+}
+
 export const confirm = async (token) => {
     let res = await axios.get(url('auth/users/me/'),
             {
@@ -41,6 +58,11 @@ export const confirm = async (token) => {
                 }
             }
         )
+        .catch(() => {
+            localStorage.removeItem('Token')
+            goto('/')
+            console.log('redirect')
+        })
 
     return { res }
 }

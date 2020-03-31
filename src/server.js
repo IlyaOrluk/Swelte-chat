@@ -40,6 +40,7 @@ io(server).sockets.on('connection', function(socket) {
 			console.log('leave from '+room)
 			socket.leave(room)
 		})
+		// console.log(socket.clients(room))
 	})
 })
 

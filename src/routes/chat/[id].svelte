@@ -17,8 +17,15 @@
 		scroll-behavior: smooth;
 		box-sizing: border-box;
 	}
+
+	.messages__wrapper {
+		width: 95%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
 	.messages__item {
-		width: 90%;
+		width: 85%;
 		min-height: 50px;
 		display: flex;
 		justify-content: space-between;
@@ -33,9 +40,21 @@
 		display: flex;
 		flex-direction: column;
 	}
+	.avatar {
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		object-fit: cover;
+		margin: 0;
+	}
+	h2 {
+		margin: 0;
+		font-size: 13px;
+		text-align: center;
+	}
 	.me {
 		border-radius: 25px 25px 0 25px;
-		background-color: #fff;
+		background-color: #f4f4f4;
 		border: 1px solid rgb(233, 223, 223);
 	}
 
@@ -105,12 +124,19 @@
 	import { scale } from 'svelte/transition'
 	import { quintOut } from 'svelte/easing'
 	import { name } from '../../store.js'
+	import { confirm } from '../../utils/auth.js'
 	import axios from 'axios'
 	export let id
 
-	// if(!$name) goto('/')
+	let user = {
+		username: ''
+	}
+	onMount(() => {
+		confirm(localStorage.getItem('Token'))
+            .then(res => user = res.res.data)
+	})
 	onDestroy(() => {
-		console.log('destroy onmount')
+		console.log('destroy unmount')
 		socket.emit('leave room')
 	})
 	const scrollBottom = (element, scroll) => {
@@ -118,44 +144,25 @@
 	}
 
 	let message = ''
-	let messages = [{name: 'Frank',message: 'Hi all!',  time: '4:20'}]
+	let messages = [{avatar: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.ytimg.com%2Fvi%2FQFlpz_moRvI%2Fmaxresdefault.jpg&f=1&nofb=1', name: 'Frank',message: 'Hi all!',  time: '4:20'}]
+	//listen socket
 	socket.on('chat', data => {
-		messages = [...messages, {name: data.name,message: data.message,  time: data.time}]
+		messages = [...messages, {avatar: data.avatar, name: data.name, message: data.message,  time: data.time}]
 		setTimeout(() => scrollBottom(document.querySelector('.messages'), document.querySelector('.messages').scrollHeight), 210);
 	})
+	//add info to socket
 	const addMessage = () => {
 		let date = new Date
-		socket.emit('chat', {name: $name, message: message,  time: `${date.getHours()}:${date.getMinutes()}`})
-		messages = [...messages, {name: $name, message: message,  time: `${date.getHours()}:${date.getMinutes()}`}]
+		socket.emit('chat', {avatar: user.avatar, name: user.username, message: message,  time: `${date.getHours()}:${date.getMinutes()}`})
+		messages = [...messages, {avatar: user.avatar, name: user.username, message: message,  time: `${date.getHours()}:${date.getMinutes()}`}]
 		message = ''
 
 		setTimeout(() => scrollBottom(document.querySelector('.messages'), document.querySelector('.messages').scrollHeight), 210);
 	}
 
 	
-	const url = 'http://127.0.0.1:8000/auth/users/me/'
-	let user
-	const confirm = (token) => {
-		console.log('confirm chat')
-            axios.get(url,
-                {
-                    headers: {
-                        "Authorization" : `Bearer ${localStorage.getItem('Token')}` 
-                    }
-                }
-            )
-                .then(res => {
-					user = res.data
-					name.set(res.data.username)
-					console.log(res.data)
-				})
-    
-	}
-	
-	onMount(() => {
-		console.log('mount')
-		if(localStorage) confirm(localStorage.getItem('Token'))
-	})
+
+
 </script>
 
 <svelte:head>
@@ -166,19 +173,29 @@
 <main>
 	<div class='header'>
 		<a href='/'><i class="fas fa-arrow-left"></i></a>
-		<h2>Room({id})</h2>
-		<img src='https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn4.iconfinder.com%2Fdata%2Ficons%2Fwirecons-free-vector-icons%2F32%2Fmenu-alt-256.png&f=1&nofb=1' alt=''>
+		<div>
+		<h2>Frank </h2><img class='avatar' src={'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.ytimg.com%2Fvi%2FQFlpz_moRvI%2Fmaxresdefault.jpg&f=1&nofb=1'} alt=''>
 	</div>
+	<img src='https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn4.iconfinder.com%2Fdata%2Ficons%2Fwirecons-free-vector-icons%2F32%2Fmenu-alt-256.png&f=1&nofb=1' alt=''>
+		</div>
 	<div class='messages'>
 		{#each messages as message}
 			{#if message}
-			<div class={`messages__item ${message.name === $name? 'me':''}`} transition:scale="{{duration: 200, delay: 0, opacity: 0, start: 0, easing: quintOut}}">
-				<div>
-					<b><label>{message.name}</label></b>
-					<span>{message.message}</span>
+				<div class='messages__wrapper'>
+					{#if message.name !== user.username}
+						<img class='avatar' src={message.avatar} alt=''>
+					{/if}
+					<div class={`messages__item ${message.name === user.username ? 'me':''}`} transition:scale="{{duration: 200, delay: 0, opacity: 0, start: 0, easing: quintOut}}">
+						<div>
+							<b><label>{message.name}</label></b>
+							<span>{message.message}</span>
+						</div>
+						<span>{message.time}</span>
+					</div>
+					{#if message.name === user.username}
+						<img class='avatar' src={message.avatar} alt=''>
+					{/if}
 				</div>
-				<span>{message.time}</span>
-			</div>
 			{/if}
 		{/each}
 	</div>
