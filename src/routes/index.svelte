@@ -1,33 +1,27 @@
-<style>
-	img {
-		width: 100vw;
-		max-width: 670px;
-	}
-</style>
-
-
 <script>
-	import { name } from '../store.js'
-	import { onMount } from 'svelte';
-	import Login from '../components/Login.svelte'
-	import Signup from '../components/Signup.svelte'
-	
-	let token
-	onMount(() => {
-		token = localStorage.getItem('Token')
-	})
+  let username = "";
+  let avatar = "";
+  const setDateToLocal = (username, avatar) => {
+    localStorage.setItem("username", username);
+    localStorage.setItem("avatar", avatar);
+  };
 </script>
 
-<svelte:head>
-	<title>Sapper Chat</title>
-</svelte:head>
-
-{#if !token}
-	<Login />
-	or
-	<Signup/>
-{:else}
-	<span>Welcome to Chat App </span><a href='/me'>your account...</a>
-{/if}
-
-<!-- <img src='https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fuimovement.com%2Fmedia%2Fresource_image%2Fimage_6761_Aoi4J5i.gif&f=1&nofb=1' alt=''> -->
+<nav>
+  <div>
+    <input
+      placeholder="type chat name..."
+      value={username}
+      on:input={(e) => (username = e.target.value)}
+    />
+        <input
+      placeholder="enter avatar link..."
+      value={avatar}
+      on:input={(e) => (avatar = e.target.value)}
+    />
+    <a href={"/chat/1"} on:click={() => setDateToLocal(username, avatar)}>
+      <button>ENTER CHAT</button>
+    </a>
+  </div>
+  <!-- <button on:click={() => logout()}>LOGOUT</button> -->
+</nav>
