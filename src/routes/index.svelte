@@ -1,27 +1,33 @@
 <script>
-  let username = "";
-  let avatar = "";
-  const setDateToLocal = (username, avatar) => {
-    localStorage.setItem("username", username);
-    localStorage.setItem("avatar", avatar);
-  };
+  import { afterUpdate, onMount } from "svelte";
+  import io from "socket.io-client";
+  import Login from "../components/Login.svelte";
+  import UsersBar from "../components/UsersBar.svelte";
+  import { users } from "../stores/users.js";
+
+  const socket = io.connect();
+
+  onMount(() => {
+    // socket.emit("getUsers");
+  });
+
+  socket.on("users", (data) => {
+    console.log(data);
+    users.set(data);
+  });
 </script>
 
-<nav>
-  <div>
-    <input
-      placeholder="type chat name..."
-      value={username}
-      on:input={(e) => (username = e.target.value)}
-    />
-        <input
-      placeholder="enter avatar link..."
-      value={avatar}
-      on:input={(e) => (avatar = e.target.value)}
-    />
-    <a href={"/chat/1"} on:click={() => setDateToLocal(username, avatar)}>
-      <button>ENTER CHAT</button>
-    </a>
-  </div>
-  <!-- <button on:click={() => logout()}>LOGOUT</button> -->
-</nav>
+<div class="wrapper">
+  <UsersBar users={$users} />
+  <Login users={$users} />
+</div>
+
+<style>
+  .wrapper {
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+  }
+</style>
